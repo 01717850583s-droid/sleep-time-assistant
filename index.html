@@ -64,13 +64,56 @@
     .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#60a5fa)}
 
     /* Sounds */
-    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .sound{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
-    .sound .title{display:flex;align-items:center;gap:10px}
-    .badge{font-size:12px;color:#0b1020;background:linear-gradient(135deg,var(--accent-2),#7dd3fc);padding:4px 8px;border-radius:999px;font-weight:700}
-    .play{cursor:pointer;background:#1a2046;border:1px solid rgba(255,255,255,.08);color:var(--text);padding:8px 10px;border-radius:10px}
-    .play.active{background:linear-gradient(135deg,var(--accent),#60a5fa);color:#0b1020;font-weight:700}
+    <section id="sounds" class="section">
+  <div class="container">
+    <h2>Calming soundscapes</h2>
+    <p class="muted">Stream relaxing soundscapes from YouTube. Volume low is best for sleep.</p>
+    <div class="grid-3" id="soundList">
+      <div class="card sound">
+        <div class="title"><span class="badge">Rain</span> <span class="muted">Soft drizzle</span></div>
+        <button class="play" onclick="playYouTube('rain')">Play</button>
+      </div>
+      <div class="card sound">
+        <div class="title"><span class="badge">Ocean</span> <span class="muted">Gentle waves</span></div>
+        <button class="play" onclick="playYouTube('ocean')">Play</button>
+      </div>
+      <div class="card sound">
+        <div class="title"><span class="badge">Lo-fi</span> <span class="muted">Slow, warm</span></div>
+        <button class="play" onclick="playYouTube('lofi')">Play</button>
+      </div>
+    </div>
+    <div id="playerBox" style="margin-top:18px;"></div>
+    <p class="note" id="soundStatus" style="margin-top:8px">No sound playing.</p>
+  </div>
+</section>
 
+<script>
+  // Map sound keys to YouTube embed URLs (you can swap these for other relaxing tracks)
+  const YT_SOUNDS = {
+    rain: "https://www.youtube.com/embed/1KAOq7XX2OY?autoplay=1&controls=0&loop=1&playlist=1KAOq7XX2OY",
+    ocean: "https://www.youtube.com/embed/DJZo3K1N-Gw?autoplay=1&controls=0&loop=1&playlist=DJZo3K1N-Gw",
+    lofi: "https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&controls=0&loop=1&playlist=jfKfPfyJRdk"
+  };
+
+  function playYouTube(type) {
+    const url = YT_SOUNDS[type];
+    const playerBox = document.getElementById("playerBox");
+    playerBox.innerHTML = `
+      <iframe
+        width="100%" height="120"
+        src="${url}"
+        title="Relaxing ${type} sound"
+        frameborder="0"
+        allow="autoplay"
+        style="border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.20); background:#222;"
+      ></iframe>
+    `;
+    document.getElementById("soundStatus").textContent = "Playing: " + type.charAt(0).toUpperCase() + type.slice(1);
+    // Optionally, visually highlight which sound is active
+    document.querySelectorAll('#soundList .play').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`#soundList .play[onclick*="${type}"]`).classList.add('active');
+  }
+</script>
     /* Tracker */
     form{display:grid;gap:12px}
     input, textarea, select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.02);color:var(--text)}
