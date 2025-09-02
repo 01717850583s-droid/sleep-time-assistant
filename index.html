@@ -68,47 +68,74 @@
   <div class="container">
     <h2>AI-Powered Calming Soundscapes</h2>
     <p class="muted">
-      Enjoy ambient, generative, and AI-mixed soundscapes streamed live from YouTube. 
-      Click Play below to start a relaxing background sound — all generated or blended by AI and creative artists.
+      Play ambient, generative, and AI-mixed soundscapes streamed live from YouTube or upload your own MP3. 
+      Click Play below to stream a relaxing background — you can switch anytime. 
+      If you want to listen to your own sound, upload a file!
     </p>
     <div class="grid-3" id="soundList">
       <div class="card sound">
         <div class="title">
-          <span class="badge">AI Rain</span> 
+          <span class="badge">AI Rain</span>
           <span class="muted">Endless Generative Rain</span>
         </div>
         <button class="play" onclick="playYouTubeAI('rain')">Play</button>
       </div>
       <div class="card sound">
         <div class="title">
-          <span class="badge">AI Ocean</span> 
+          <span class="badge">AI Ocean</span>
           <span class="muted">AI‑Mixed Ocean Waves</span>
         </div>
         <button class="play" onclick="playYouTubeAI('ocean')">Play</button>
       </div>
       <div class="card sound">
         <div class="title">
-          <span class="badge">AI Lo-fi</span> 
+          <span class="badge">AI Lo-fi</span>
           <span class="muted">AI Chill Lo-fi Beats</span>
         </div>
         <button class="play" onclick="playYouTubeAI('lofi')">Play</button>
       </div>
+      <div class="card sound">
+        <div class="title">
+          <span class="badge">AI Forest</span>
+          <span class="muted">Generative Forest Night</span>
+        </div>
+        <button class="play" onclick="playYouTubeAI('forest')">Play</button>
+      </div>
+      <div class="card sound">
+        <div class="title">
+          <span class="badge">AI Space</span>
+          <span class="muted">Ambient Cosmic Soundscape</span>
+        </div>
+        <button class="play" onclick="playYouTubeAI('space')">Play</button>
+      </div>
+      <div class="card sound">
+        <div class="title">
+          <span class="badge">Upload MP3</span>
+          <span class="muted">Your Custom Sound</span>
+        </div>
+        <input type="file" id="soundUpload" accept="audio/mp3,audio/mpeg" style="margin-top:8px;">
+        <button class="play" onclick="playUploadedSound()">Play Uploaded</button>
+      </div>
     </div>
     <div id="playerBox" style="margin-top:18px;"></div>
+    <audio id="localPlayer" style="display:none;"></audio>
     <p class="note" id="soundStatus" style="margin-top:8px">No sound playing.</p>
   </div>
 </section>
-
 <script>
-  // Free "AI" soundscapes (YouTube links to generative/AI mixes):
-  // You can swap these links for other ambient/AI music as needed!
+  // More free "AI" soundscape YouTube links
   const YT_AI_SOUNDS = {
     rain: "https://www.youtube.com/embed/DL6VjF3bT9c?autoplay=1&controls=0&loop=1&playlist=DL6VjF3bT9c", // 12hr AI Rain
     ocean: "https://www.youtube.com/embed/DSJ9PFUCFwM?autoplay=1&controls=0&loop=1&playlist=DSJ9PFUCFwM", // AI Ocean
-    lofi: "https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&controls=0&loop=1&playlist=jfKfPfyJRdk"  // AI Lo-fi Chill Beats
+    lofi: "https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&controls=0&loop=1&playlist=jfKfPfyJRdk", // Lo-fi Chill Beats
+    forest: "https://www.youtube.com/embed/MMy1Uu0tYjY?autoplay=1&controls=0&loop=1&playlist=MMy1Uu0tYjY", // Forest Night
+    space: "https://www.youtube.com/embed/Qt0DdLh1d4s?autoplay=1&controls=0&loop=1&playlist=Qt0DdLh1d4s" // Cosmic Ambient
   };
 
+  // Play YouTube AI soundscape
   function playYouTubeAI(type) {
+    // Stop local player if active
+    stopLocalPlayer();
     const url = YT_AI_SOUNDS[type];
     const playerBox = document.getElementById("playerBox");
     playerBox.innerHTML = `
@@ -126,6 +153,46 @@
     document.querySelectorAll('#soundList .play').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`#soundList .play[onclick*="${type}"]`).classList.add('active');
   }
+
+  // Local MP3 playback logic
+  function playUploadedSound() {
+    stopYouTubePlayer();
+    const input = document.getElementById('soundUpload');
+    const soundStatus = document.getElementById("soundStatus");
+    if (!input.files || !input.files[0]) {
+      soundStatus.textContent = "No file selected. Please choose an MP3 file.";
+      return;
+    }
+    const file = input.files[0];
+    const url = URL.createObjectURL(file);
+    const player = document.getElementById('localPlayer');
+    player.src = url;
+    player.loop = true;
+    player.volume = 0.25;
+    player.play().then(() => {
+      soundStatus.textContent = "Playing your uploaded sound: " + file.name;
+      document.querySelectorAll('#soundList .play').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`#soundList .play[onclick*="playUploadedSound"]`).classList.add('active');
+    }).catch(() => {
+      soundStatus.textContent = "Could not play. Please upload a valid MP3 file.";
+    });
+  }
+
+  // Helpers to stop one player when other starts
+  function stopLocalPlayer() {
+    const player = document.getElementById('localPlayer');
+    player.pause();
+    player.src = '';
+  }
+  function stopYouTubePlayer() {
+    document.getElementById("playerBox").innerHTML = '';
+  }
+
+  // Auto-stop YouTube if user uploads and plays MP3, and vice versa
+  document.getElementById('soundUpload').addEventListener('change', () => {
+    stopYouTubePlayer();
+    document.getElementById("soundStatus").textContent = "Ready to play your uploaded sound.";
+  });
 </script>
     /* Tracker */
     form{display:grid;gap:12px}
